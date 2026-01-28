@@ -9,22 +9,17 @@ const taskRoutes = require("./routes/api/taskRoutes");
 
 const app = express();
 
-// Note to self: this lets Express read JSON from request bodies
+// Note to self: parse JSON request bodies
 app.use(express.json());
 
-// Note to self: simple test route to confirm server is running
+// Note to self: health check
 app.get("/", (req, res) => {
   res.json({ message: "TaskMaster API running" });
 });
 
-// Note to self: route wiring
+// Note to self: mount routers (these MUST export a router function)
 app.use("/api/users", userRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api", taskRoutes);
-
-// Note to self: fallback route handler (404)
-app.use((req, res) => {
-  res.status(404).json({ error: "Route not found" });
-});
 
 module.exports = app;
