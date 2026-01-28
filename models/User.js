@@ -7,7 +7,6 @@ const { Schema } = mongoose;
 
 const userSchema = new Schema(
   {
-    // Note to self: username is required for display/logins
     username: {
       type: String,
       required: true,
@@ -16,7 +15,6 @@ const userSchema = new Schema(
       maxlength: 50,
     },
 
-    // Note to self: email must be unique so no duplicate accounts
     email: {
       type: String,
       required: true,
@@ -26,7 +24,6 @@ const userSchema = new Schema(
       match: [/^\S+@\S+\.\S+$/, "Please provide a valid email address"],
     },
 
-    // Note to self: we store the hashed password (never plain text)
     password: {
       type: String,
       required: true,
@@ -36,23 +33,15 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-// Note to self: before saving, hash password only if it was created/changed
+// Hash password before saving
 userSchema.pre("save", async function (next) {
-  try {
-    if (!this.isModified("password")) return next();
-
-    const saltRounds = 10;
-    const hashed = await bcrypt.hash(this.password, saltRounds);
-
-    this.password = hashed;
-    return next();
-  } catch (err) {
-    return next(err);
-  }
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
 });
 
-// Note to self: helper method to compare a plain password with the stored hash
-userSchema.methods.comparePassword = async function (candidatePassword) {
+// Compare passwords during login
+userSchema.methods.comparePassword = function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
