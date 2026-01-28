@@ -1,5 +1,5 @@
-// app.js
-// Note to self: this file creates the Express app and wires middleware + routes
+// Note to self: app.js builds the Express app and mounts routes.
+// Note to self: server.js is responsible for starting the app and connecting the DB.
 
 const express = require("express");
 
@@ -9,15 +9,15 @@ const taskRoutes = require("./routes/api/taskRoutes");
 
 const app = express();
 
-// Note to self: parse JSON request bodies
+// Note to self: built-in middleware to parse JSON request bodies
 app.use(express.json());
 
-// Note to self: health check
+// Note to self: quick health check route so we can confirm the server responds
 app.get("/", (req, res) => {
-  res.json({ message: "TaskMaster API running" });
+  res.status(200).json({ message: "TaskMaster API running" });
 });
 
-// Note to self: mount routers (these MUST export a router function)
+// Note to self: mount API route modules
 app.use("/api/users", userRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api", taskRoutes);
